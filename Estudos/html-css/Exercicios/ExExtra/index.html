@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnglishLab - Seu Portal de Estudos</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-gradient: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+                --card-bg: #1a202c;
+                --text-main: #f7fafc;
+                --text-muted: #a0aec0;
+                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 850px) {
+            .dashboard { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+
+        h1, h2, h3 {
+            margin-top: 0;
+            color: var(--text-main);
+        }
+
+        header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        header h1 { font-size: 2.5rem; margin-bottom: 5px; }
+        header p { color: var(--text-muted); font-size: 1.1rem; margin: 0;}
+
+        /* Tradutor */
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 600px) {
+            .grid-inputs { grid-template-columns: 1fr; }
+        }
+
+        textarea {
+            width: 100%;
+            height: 140px;
+            padding: 15px;
+            border: 1px solid var(--text-muted);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text-main);
+            font-size: 1rem;
+            resize: none;
+            box-sizing: border-box;
+        }
+
+        .output-box {
+            width: 100%;
+            height: 140px;
+            padding: 15px;
+            border: 1px dashed var(--text-muted);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.02);
+            font-size: 1rem;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: var(--secondary); color: white; }
+        .btn-accent { background: var(--accent); color: white; }
+
+        /* Widget Lateral (Timer e Palavra do Dia) */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .word-day-box {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .word-day-box h3 { color: white; margin-bottom: 5px;}
+
+        .timer-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        /* Caderno de Vocabulário */
+        .notebook-section {
+            grid-column: 1 / -1;
+        }
+
+        .vocab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .vocab-card {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .vocab-card {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        .vocab-card button {
+            padding: 4px 8px;
+            min-width: auto;
+            background: transparent;
+            color: var(--danger);
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <header>
+        <h1>⚡ EnglishLab</h1>
+        <p>Seu ecossistema inteligente de prática e tradução de inglês</p>
+    </header>
+
+    <!-- Área Principal do Tradutor -->
+    <div class="card">
+        <h2>🔄 Tradutor Dinâmico</h2>
+        <div class="grid-inputs">
+            <div>
+                <textarea id="inputText" placeholder="Digite em Português ou Inglês..."></textarea>
+            </div>
+            <div>
+                <div id="outputText" class="output-box">A tradução inteligente aparecerá aqui...</div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn-primary" onclick="traduzirTexto()">Traduzir Texto</button>
+            <button class="btn-secondary" onclick="falarTexto()">🔊 Ouvir</button>
+            <button class="btn-accent" onclick="salvarNoCaderno()">💾 Salvar no Caderno</button>
+        </div>
+    </div>
+
+    <!-- Barra Lateral com Ferramentas de Estudo -->
+    <div class="sidebar">
+        <!-- Palavra do Dia -->
+        <div class="card word-day-box">
+            <h3>💡 Word of the Day</h3>
+            <h2 id="dailyWord" style="margin: 10px 0; font-size: 2rem;">Resilience</h2>
+            <p id="dailyMeaning" style="margin: 0; opacity: 0.9;">Significado: Resiliência (Capacidade de se recuperar facilmente de dificuldades).</p>
+        </div>
+
+        <!-- Timer Pomodoro para Foco nas Aulas -->
+        <div class="card">
+            <h3 style="text-align: center; margin-bottom: 5px;">⏱️ Timer de Foco</h3>
+            <div class="timer-display" id="timer">25:00</div>
+            <div class="btn-group">
+                <button class="btn-primary" id="startBtn" onclick="toggleTimer()">Iniciar</button>
+                <button style="background: var(--text-muted); color: white;" onclick="resetTimer()">Resetar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção do Caderno de Estudos -->
+    <div class="card notebook-section">
+        <h2>📓 Meu Caderno de Vocabulários</h2>
+        <p style="color: var(--text-muted); margin-top: -10px;">Clique em "Salvar no Caderno" para fixar o conteúdo estudado aqui.</p>
+        <div id="vocabGrid" class="vocab-grid"></div>
+    </div>
+</div>
+
+<script>
+    // Configurações do Caderno
+    let caderno = JSON.parse(localStorage.getItem('englishlab_caderno')) || [];
+
+    // Banco de palavras do dia simples para rotacionar aleatoriamente
+    const palavrasDoDia = [
+        { word: "Overcome", meaning: "Superar / Vencer um obstáculo." },
+        { word: "Breakthrough", meaning: "Avanço importante ou descoberta tecnológica/pessoal." },
+        { word: "Thrive", meaning: "Prosperar / Crescer com saúde e força." },
+        { word: "Flawless", meaning: "Perfeito / Sem defeitos." },
+        { word: "Grateful", meaning: "Grato / Agradecido por algo." }
+    ];
+
+    // Define uma palavra do dia aleatória ao carregar
+    function carregarPalavraDoDia() {
+        const sorteada = palavrasDoDia[Math.floor(Math.random() * palavrasDoDia.length)];
+        document.getElementById('dailyWord').innerText = sorteada.word;
+        document.getElementById('dailyMeaning').innerText = `Significado: ${sorteada.meaning}`;
+    }
+
+    // Lógica de Tradução
+    async function traduzirTexto() {
+        const texto = document.getElementById('inputText').value.trim();
+        const outputDiv = document.getElementById('outputText');
+        
+        if (!texto) {
+            outputDiv.innerText = "Por favor, digite algo para traduzir.";
+            return;
+        }
+
+        outputDiv.innerText = "Traduzindo...";
+
+        let langPair = "pt|en";
+        if (/[A-Za-z]/.test(texto) && (texto.toLowerCase().includes('the') || texto.toLowerCase().includes('you') || texto.toLowerCase().includes('is') || texto.toLowerCase().includes('are'))) {
+            langPair = "en|pt";
+        }
+
+        try {
+            const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=${langPair}`);
+            const data = await res.json();
+            if (data.responseData) {
+                outputDiv.innerText = data.responseData.translatedText;
+            } else {
+                outputDiv.innerText = "Erro ao obter tradução.";
+            }
+        } catch (error) {
+            outputDiv.innerText = "Erro na conexão.";
+        }
+    }
+
+    // Lógica de Pronúncia
+    function falarTexto() {
+        const texto = document.getElementById('outputText').innerText;
+        if (texto && !texto.includes("...")) {
+            const utterance = new SpeechSynthesisUtterance(texto);
+            // Identifica se o texto falado deve ser em inglês
+            utterance.lang = /[a-zA-Z]/.test(texto) ? 'en-US' : 'pt-BR';
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    // Lógica do Caderno
+    function salvarNoCaderno() {
+        const original = document.getElementById('inputText').value.trim();
+        const traduzido = document.getElementById('outputText').innerText;
+
+        if (!original || traduzido.includes("...")) return;
+
+        const item = { id: Date.now(), original, traduzido };
+        caderno.push(item);
+        localStorage.setItem('englishlab_caderno', JSON.stringify(caderno));
+        renderizarCaderno();
+    }
+
+    function renderizarCaderno() {
+        const grid = document.getElementById('vocabGrid');
+        grid.innerHTML = '';
+
+        if (caderno.length === 0) {
+            grid.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1; text-align: center;">Nenhum vocabulário salvo ainda.</p>';
+            return;
+        }
+
+        caderno.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'vocab-card';
+            card.innerHTML = `
+                <div>
+                    <strong style="font-size: 1.1rem;">${item.original}</strong>
+                    <div style="color: var(--primary); margin-top: 5px; font-size: 0.95rem;">➔ ${item.traduzido}</div>
+                </div>
+                <button onclick="deletarItem(${item.id})">🗑️</button>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function deletarItem(id) {
+        caderno = caderno.filter(item => item.id !== id);
+        localStorage.setItem('englishlab_caderno', JSON.stringify(caderno));
+        renderizarCaderno();
+    }
+
+    // Lógica do Timer Pomodoro (25 Minutos)
+    let tempoRestante = 25 * 60;
+    let timerId = null;
+
+    function atualizarDisplayTimer() {
+        const minutos = Math.floor(tempoRestante / 60).toString().padStart(2, '0');
+        const segundos = (tempoRestante % 60).toString().padStart(2, '0');
+        document.getElementById('timer').innerText = `${minutos}:${segundos}`;
+    }
+
+    function toggleTimer() {
+        const btn = document.getElementById('startBtn');
+        if (timerId) {
+            clearInterval(timerId);
+            timerId = null;
+            btn.innerText = "Iniciar";
+            btn.style.background = "var(--primary)";
+        } else {
+            btn.innerText = "Pausar";
+            btn.style.background = "var(--accent)";
+            timerId = setInterval(() => {
+                if (tempoRestante > 0) {
+                    tempoRestante--;
+                    atualizarDisplayTimer();
+                } else {
+                    clearInterval(timerId);
+                    alert("Hora de fazer uma pausa nos estudos!");
+                    resetTimer();
+                }
+            }, 1000);
+        }
+    }
+
+    function resetTimer() {
+        clearInterval(timerId);
+        timerId = null;
+        tempoRestante = 25 * 60;
+        atualizarDisplayTimer();
+        const btn = document.getElementById('startBtn');
+        btn.innerText = "Iniciar";
+        btn.style.background = "var(--primary)";
+    }
+
+    // Inicialização da Página
+    carregarPalavraDoDia();
+    renderizarCaderno();
+</script>
+
+</body>
+</html>
